@@ -1,0 +1,66 @@
+--1. 도서명과 출판사 
+--select bookname, publisher, price
+--from book
+--where price >= 10000;
+
+--2. 1만원 이상 2만원 이하 도서정보
+--select bookname, publisher, price
+--from book
+--where price >= 10000 and price = 20000
+
+
+--3. 1만원 이하의 도서 개수
+--select count(*)
+--from book
+--where price >= 10000;
+
+--4. book 이라는 목록의 전체 값
+--select*from book
+
+--5.
+--select*
+--from book
+--where publisher = '나무수';
+
+--6.
+--select bookid, bookname, publisher, price
+--from book
+--where bookid >= 5 and bookid <= 10;
+
+--6-1.
+--select bookid, bookname, publisher, price
+--from book
+--where bookid between 5 and 10;
+
+--7. 도서명순으로 도서명과 가격
+--select bookname, price
+--from book
+--order by bookname; 
+
+--order by:정렬, ASC:ascending(오름차순), DESC:descending(내림차순)
+
+--8. 가격순으로 도서명과 가격
+--SELECT bookname, price
+--from book
+--order by price desc;
+
+--9. 출판사가 나무수인 도서정보
+SELECT*
+from book
+where publisher = '나무수';
+
+--9-1. 출판사가 굿스포츠인 도서정보
+SELECT*
+from book
+where publisher = '굿스포츠';
+ 
+ 
+--10.출판사가 나무수, 굿스포츠인 도서정보
+SELECT*
+from book
+where publisher = '나무수' or publisher = '굿스포츠';
+
+--10-1.출판사가 나무수, 굿스포츠인 도서정보
+SELECT*
+from book
+where publisher in('나무수','굿스포츠')

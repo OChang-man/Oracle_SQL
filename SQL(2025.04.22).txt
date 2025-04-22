@@ -1,0 +1,15 @@
+/* 인덱스 만들고 삭제하기 */
+
+CREATE INDEX ix_book on book (bookname);
+
+CREATE INDEX ix_book2 on book (publisher, price);
+
+SELECT * FROM user_indexes;
+
+SELECT *
+FROM book
+WHERE publisher='대한미디어' and price >= 30000; /* F10을 누르면 operation창이 뜬다. cost가 낮을 수록 검색속도가 빠름 */
+
+SELECT name FROM customer WHERE name LIKE '박세리';
+CREATE INDEX ix_customer on customer (name);
+DROP INDEX ix_customer;

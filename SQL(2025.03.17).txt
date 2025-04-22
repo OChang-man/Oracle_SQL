@@ -1,0 +1,316 @@
+--1. 도서번호 1번인 도서정보--
+--select*
+--from book
+--where bookid = 1;
+
+--2.이름이 박지성이 고객정보--
+select*
+from customer
+where NAME = '박지성';
+
+--3.1번도서 주문정보
+SELECT*
+from orders
+where bookid = 1;
+
+--4.전화번호가 NULL인 고객정보
+select*
+from customer
+where phone is NULL;
+
+--5.전화번호가 있는 고객정보
+select*
+from customer
+where phone is not NULL;
+
+--
+select publisher, price
+from book
+where bookname LIKE'축구의 역사';
+
+--
+select phone
+from customer
+where name = '김연아';
+
+-- 질의 3-1 모든 도서의 이름과 가격을 검색하시오
+select bookname, price
+from book;
+
+--7.가격과 도서명
+select price, bookname
+from book;
+
+--8.가격이 10000원 이상인 도서명, 가격
+select bookname, price
+from book
+where price >= 10000;
+
+--9.모든 도서정보
+--select bookid, bookname, publisher, price
+--from book
+
+--10.모든 도서정보
+--select*
+--from book
+
+--11.모든 출판사
+--select all publisher
+--from book
+
+--12.출판사(중복없이 - DISTINCT)
+--select distinct publisher
+--from book
+
+--13.도서가격이 20000원 이하
+select*
+from book
+where price < 20000;
+
+--14-1.가격이 10000~20000 도서정보 (and, or , not)
+select*
+from book
+where price >= 10000 and price <= 20000;
+
+--14-2.가격이 10000~20000 도서정보 (between)
+select*
+from book
+where price BETWEEN 10000 and 20000;
+
+--15-1.가격이 7000, 8000, 13000 인 도서명 (and, or , not)
+select BOOKNAME, price
+from book
+where price = 7000 or price = 8000 or price = 13000;
+
+--15-2.가격이 7000, 8000, 13000 인 도서명 [in( , , ,)]
+select BOOKNAME, price
+from book
+where price in(7000,8000,13000);
+
+--16.연락저가 없는 고객명
+select name
+from CUSTOMER
+where phone is NULL;
+
+--17. 연락처가 있는 고객명
+select name
+from CUSTOMER
+where phone is not NULL;
+
+--18.도서명이 '축구의 역사'이거나 가격이 10000원 이상인 도서명과 가격
+select bookname, price
+from book
+where BOOKNAME='축구의 역사' or price >= 10000;
+
+--ex) group by
+--select custid, SUM
+--from order
+
+--19.출판사과 굿스포즈이고 가격이 10000원 미만인 도서명과 가격
+select bookname, price
+from book
+where PUBLISHER = '굿스포츠' and Price < 10000;
+
+--20.출판사가 굿스포츠 또는 대한미디어가 아닌 도서정보
+select*
+from book
+where not PUBLISHER = '굿스포츠' or PUBLISHER = '대한미디어';
+--not > or
+select*
+from book
+where (PUBLISHER = '굿스포츠') or (PUBLISHER = '대한미디어');
+--같지 않다 라는 연산자 [!=, ^=, <>, not in()]
+
+--21.출판사가 굿스포츠 또는 대한미디어가 아닌 도서정보 [not in() ]
+select*
+from book
+where PUBLISHER not in('굿스포츠', '대한미디어');
+
+--22.'축구아는 여자' 라는 도서명과 출판사, 가격
+select PUBLISHER, price
+from book
+where bookname = '축구아는 여자';
+
+--23.도서명에 축구가 들어간 도서명과 출판사
+select bookname, PUBLISHER
+from book
+where bookname like '%축구%';
+
+--24.고객 중 성이 김씨인 고객정보
+select*
+from CUSTOMER
+where NAME like '김%';
+
+--25.고객 중 성이 김씨인 고객의 수
+select COUNT(*)
+from CUSTOMER
+where NAME like '김%';
+
+--26.고객 수
+--select COUNT(*)
+--from CUSTOMER
+
+--26-1.고객 수
+--select COUNT(name)
+--from CUSTOMER
+
+--26-2.고객 수( null이 있기 때문에 4개 )
+--select COUNT(phone)
+--from CUSTOMER
+
+--27.도서명의 두번째 글자가 '구'인 도서명 ['_'가 칸을 의미]
+select bookname
+from book
+where bookname like '_구%';
+
+--28.도서명에 축구가 있고, 가격이 20000원 이상의 도서명과 가격
+select bookname, price
+from book
+where bookname like '%축구%' and price >= 20000;
+
+--29.출판사가 굿스포츠 또는 대한미디어 인 도서정보
+select*
+from book
+where publisher in('굿스포츠', '대한미디어');
+
+select*
+from book
+where publisher like'굿스포츠' or publisher like '대한미디어';
+
+--30.도서명순으로 도서정보
+select*
+from book
+ORDER BY bookname;
+
+--31.출판사순으로 출판사,도서명
+select PUBLISHER, bookname
+from book
+ORDER BY PUBLISHER;
+
+
+--32.가격순으로 도서명, 가격
+select bookname, price
+from book
+ORDER BY price;
+
+
+--33.도서정보를 가격수으로 정렬하되 같은 가격이면 도서명 역순으로
+select*
+from book
+ORDER BY price, bookname desc;
+
+--34.도서가격이 비싼것 부터 검색하되 같은 가격이면 출판사 오름차룬으로 도서정보
+select*
+from book
+ORDER BY price DESC, PUBLISHER;
+
+--35.10000원 이상인 도서를 대상으로 가격순, 출판사 역순으로 도서명, 출판사, 가격
+select BOOKNAME, PUBLISHER, price
+from book
+where price >= 10000
+ORDER BY price, PUBLISHER desc;
+
+--36.주문정보
+select*
+from orders;
+
+--37.주문 건수
+select COUNT(*)
+from orders;
+
+--38.도서수
+select COUNT(*)
+from book;
+
+--39.고객수
+select COUNT(*)
+from CUSTOMER;
+
+--40.주문잘짜 순, 같은 날짜이면 가격 역순으로 주문정보
+select*
+from ORDERS
+order by ORDERDATE, SALEPRICE DESC;
+
+--41.주문정보 확인
+select*
+from orders;
+
+--42.주문일이 2014년 7월 5일인 주문정보
+select* 
+from orders
+where ORDERDATE = '14/07/05';
+
+--43.주문일이 2014년 7월 1일~4일인 주문정보
+select* 
+from orders
+where ORDERDATE BETWEEN '20140701' and '20140704';
+
+--44.2014년 7월의 모든 정보
+select* 
+from orders
+where ORDERDATE like '%14/07__%';
+--44-1
+select* 
+from orders
+where ORDERDATE BETWEEN '14.07.01' and '14.07.31';
+--44-2
+select* 
+from orders
+where ORDERDATE like '%14/07%';
+
+--45.2014년 주문정보
+select* 
+from orders
+where ORDERDATE like '14%';
+--45-1
+select* 
+from orders
+where ORDERDATE BETWEEN '14.01.01' and '14.12.31';
+
+--46.판매가격 합계
+select sum(saleprice) as 합계
+from orders;
+
+--47.판매가격 평균
+select sum(saleprice)/COUNT(*)
+from orders;
+--47-1.판매가격 평균
+select AVG(saleprice) "판매가격 평균"
+from orders;
+--47-1.판매가격 평균 ['as' 별칭][as는 생략 가능]
+select AVG(saleprice) as "판매가격 평균"
+from orders;
+
+--48.2번 도서의 총 판매액, 평균 판매액, 최저가, 최고가 [별칭에 민칸이 있을때, ""를 쓴다]
+select sum(SALEPRICE) as "총 판매액", AVG(saleprice) as "평균 판매액", MIN(saleprice) as 최저가, MAX(saleprice) as 최고가
+from ORDERS
+where bookid = 2;
+
+--49.고객 번호별 주문건수, 주문액 총액
+select custid as 고객번호, count(*) as 주문건수, sum(saleprice) as 주문총액
+from orders
+group by custid;
+
+--50.도서번호별 주문건수, 주문액 총액
+select bookid as 도서번호, count(*) 주문건수, sum(price) "주문액 총액"
+from book
+group by bookid;
+
+--51.
+--select  
+--from  
+--where;
+
+--52。판매가격이 10000~20000원 사이인 도서 중 2권 이상 팔린 도서를 대상으로 도서번호별 총 판매액과 판매건수를 구하시오
+select bookid, sum(saleprice) as "총 판매액", count(*) as 판매건수
+from orders
+where saleprice between 10000 and 20000
+group by bookid
+having count（*）>= 2;
+
+--53。도서가격이 10000원 미만、 20000원 초과인 도서정보
+select*
+from book
+where price < 10000 or price > 20000;
+
+

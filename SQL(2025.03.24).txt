@@ -1,0 +1,371 @@
+select name, phone
+from CUSTOMER
+where name = '김연아';
+
+select name, address
+from CUSTOMER
+where name = '추신수';
+
+select name
+from customer 
+where name like '장%';
+
+select name
+from customer
+where name like '%수';
+
+select name 
+from customer 
+where name like '_미%';
+
+select name, address
+from customer
+where address like '%서울%';
+
+/*도서 테이블에서 가격이 10000원 이하인 책이름과 출판사를 출력하시오*/
+select bookname, publisher /*책이름과 출판사를 출력*/
+from book /*'book'테이블에서*/
+where price >= 10000; /*가격이 10000원 이하인*/
+
+select publisher
+from book;
+
+select all publisher
+from book;
+
+select DISTINCT publisher
+from book;
+
+select bookid
+from orders;
+
+select distinct bookid
+from orders;
+
+select *
+from book
+order by bookname;
+
+select *
+from orders
+order by orderdate;
+
+select bookname, price
+from book
+where price >= 10000
+order by bookname;
+
+select bookname as 도서명, price 가격
+from book
+where price >= 10000
+order by bookname;
+--select에 *(모든 속성 선택)을 하고 그 중 하나만 별칭 설정은 불가능
+select *, price 가격
+from book
+where price >= 10000
+order by bookname;
+
+select bookid, bookname, publisher, price 가격
+from book
+where price >= 10000
+order by bookname;
+
+select price, price , price 가격
+from book
+where price >= 10000
+order by bookname;
+
+select*
+from orders
+order by orderdate desc;
+
+select bookname, price, publisher
+from book;
+
+select price, bookname, publisher 
+from book;
+
+select bookname, price 
+from book
+where price < 10000;
+
+select *
+from book
+where price between 10000 and 20000
+order by price desc;
+
+select bookname, publisher 
+from book
+where publisher = '굿스포츠' or publisher = '나무수';
+
+select bookname, publisher 
+from book
+where publisher in ('굿스포츠', '나무수');
+
+select bookname, publisher 
+from book
+where publisher != '굿스포츠' and publisher !='나무수';
+
+select bookname, publisher 
+from book
+where not (publisher in ('굿스포츠', '나무수'));
+
+select bookname, publisher 
+from book
+where publisher not in ('굿스포츠', '나무수');
+
+select*
+from customer
+where phone is null;
+
+select*
+from customer
+where phone is not null;
+
+select*
+from book
+where price between 10000 and 20000 and publisher = '이상미디어'
+order by price;
+
+select bookname, publisher
+from book
+where publisher in('굿스포츠', '삼성당')
+order by price desc;
+
+select*
+from book
+where price >=10000
+order by publisher, price;
+
+select publisher
+from book
+where bookname = '축구의 역사';
+
+select bookname, publisher
+from book
+where bookname like '%축구%';
+
+select bookname, publisher
+from book
+where bookname like '_구%';
+
+select *
+from book
+where bookname like '%축구%' and price >= 20000;
+
+select *
+from book
+order by price, bookname;
+
+select *
+from book
+order by price desc, publisher;
+
+select count(*)
+from orders;
+
+select sum(saleprice) "주문 총액"
+from orders;
+
+select sum(saleprice)
+from orders
+where custid = 4;
+
+select sum(saleprice), avg(saleprice), min(saleprice), max(saleprice)
+from orders;
+
+select count(*)
+from customer;
+
+select count(bookid)
+from book;
+
+select count(orderid)
+from orders
+where bookid = 1;
+
+--group by ~별 도서별 주문건수
+select bookid, count(*)
+from orders
+group by bookid
+order by bookid;
+
+select custid, count(*), sum(saleprice)
+from orders
+group by custid
+order by custid;
+
+select custid, count(*)
+from orders
+where saleprice >= 10000
+group by custid
+having count(*) >= 2
+order by custid;
+--p.43 연습문제
+--(1)
+select bookname
+from book 
+where bookid = 1;
+
+--(2)
+select bookname
+from book
+where price >= 20000;
+
+--(3)
+select sum(saleprice)
+from orders
+where custid = 1;
+
+--(4)
+select count(*)
+from orders
+where custid = 1;
+
+--연습문제2
+--(1)
+select count(*)
+from book;
+
+--(2)
+select count(distinct publisher)
+from book; 
+
+--(3)
+select name, address
+from customer;
+
+--(4)
+select orderid
+from orders
+where ORDERDATE between '2014-10-4' and '2024-7-7';
+
+--(5)
+select orderid
+from orders
+where not ORDERDATE between '2014-10-4' and '2024-7-7';
+
+--(6)
+select name, address
+from customer
+where name like '김%';
+
+--(7)
+select name, address
+from customer
+where name like '김%아'; 
+
+--크로스조인
+select*
+from customer, orders;
+
+select*
+from customer cross join orders;
+
+ --동등조인
+select*
+from customer, orders
+where customer.custid = orders.custid;
+
+
+select*
+from customer, orders
+where customer.custid = orders.custid
+order by customer.custid;
+
+
+select *
+from book, orders
+where book.bookid = orders.bookid
+order by bookid; --조인을 한 경우 공통속성의 테이블을 밝혀야 함.
+
+select book.bookid, bookname, orderdate, saleprice 
+from book, orders
+where book.bookid = orders.bookid
+order by bookid;
+
+
+select book.bookid, bookname, orderdate
+from book, orders
+where ORDERDATE like '2014/07%' and book.bookid = orders.BOOKID;
+
+
+--'to_char' 날짜를 문자로 변환하는 함수
+select to_char(sysdate,'yyyy"년"/mm"월"/dd"일" pm.hh24:mi:ss')
+from dual;
+--'to_date' 문자를 날짜로 변환하는 함수
+select to_date('2025-03-24', 'yyyy-mm-dd')
+from dual;
+
+select name, orderdate, saleprice
+from customer, orders
+where orders.custID = customer.custid;
+
+select bookname, publisher, orderdate, price, saleprice
+from book b, orders o
+where o.BOOKID = b.BOOKID;
+
+select name, count(*) as 주문건수
+from customer, orders
+where orders.custid = customer.custid
+group by customer.name;
+
+select bookname, count(*) as 주문건수, sum(saleprice) as "주문액 합계"
+from book b, orders o
+where b.bookid = o.bookid 
+group by b.bookname;
+
+--내부조인 ('inner join A in B where절' (inner단어는 생략가능)
+select bookname, count(*) as 주문건수, sum(saleprice) as "주문액 합계"
+from book b inner join orders o on b.bookid = o.bookid 
+group by b.bookname;
+
+select name, bookname  
+from book b, orders o, customer c
+where b.bookid = o.bookid and o.CUSTID = c.CUSTID;
+
+select name, bookname
+from book b, orders o, customer c
+where b.bookid = o.bookid and o.CUSTID = c.CUSTID and b.price=20000;
+
+select name, bookname
+from book b join orders o on b.bookid = o.bookid join customer c on o.CUSTID = c.CUSTID
+where price=20000;
+
+select *
+from customer left outer join orders on (customer.custid = orders.custid);
+
+select * --'outer' 생략가능
+from customer left outer join orders on (customer.custid = orders.custid)
+where orders.orderid is null;
+
+select c.*
+from customer c, orders o
+where c.custid = o. custid(+) and orderid is null;
+
+SELECT c.* 
+FROM customer c join orders o on c.CUSTID = o.CUSTID;
+
+
+
+SELECT b.* 
+FROM book b join orders o on b.bookID = o.bookID
+where orderid is not null;
+
+SELECT o.* 
+FROM book b left join orders o on b.bookID = o.bookID;
+SELECT o.* 
+FROM book b join orders o on b.bookID = o.bookID(+);
+
+
+select bookname, price
+from book
+where price= (select max(price) from book);
+
+select bookname, price
+from book
+where price= (select min(price) from book);
+
+select bookname, price
+from book
+where price >= (select avg(price) from book); 

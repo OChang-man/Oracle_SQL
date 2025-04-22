@@ -1,0 +1,319 @@
+--1
+select  
+from book b left join order o on (b.bookid=o.bookid) left join customer on(c.custid=o.custid);
+where;
+
+--2 고객별 주문건수, 주무합계, 최고 주문액, 최소 주문액, 평균주문액을 구하라(단 2건 이상 구매 고객 대상, 판매금액이 10000원 이상인 고객 대상)
+select name, count(*), sum(saleprice), max(saleprice), min(saleprice), avg(saleprice)
+from orders o join customer c on (c.custid= o.custid)
+where saleprice >= 10000
+group by c.name
+having count(*) >= 2
+order by c.name;
+
+--3 출판사별 도서수, 최고가, 최저가, 평균가
+select publisher, count(*), max(price), min(price), avg(price)
+from book
+group by publisher;
+
+--4도서명별 판매건수, 총 판매액, 평균 판매액, 최고 판매액, 최저 판매액, 판매가 20000원 이하인 도서 대상, 2권이상 팔린책 대상, 판매가 역순
+--판매가의 역순은 불가, select에 있는 속성 기준으로 정렬할 수 있음
+select bookname, sum(saleprice), avg(saleprice), max(saleprice), min(saleprice)
+from orders o join book b on (o.BOOKID = b.BOOKID)
+where o.saleprice <=20000
+group by bookname
+having count(b.bookid) >= 2
+order by bookname desc;
+
+select bookname, count(b.bookid), sum(saleprice), avg(saleprice), max(saleprice), min(saleprice)
+from orders o join book b on (o.BOOKID = b.BOOKID)
+where o.saleprice <=20000
+group by bookname
+having count(b.bookid) > 2
+order by 2 desc;
+
+--5 주문일별 판매액 합계, 평균, 최고판매가, 최저판매가, 주문건수를 최근 주문일부터 정렬(단,주문건수가 2건이상 대상)
+select orderdate, sum(saleprice), avg(saleprice), max(saleprice), min(saleprice)
+from orders
+group by orderdate
+having count(bookid) >= 2
+order by orderdate desc;
+
+--6 주문일별 정가 합계, 평균정가, 최고정가, 최저정가, 주문건수를 최근 주문일부터 정렬(단,주문건수가 2건이상 대상)
+select orderdate, sum(price), avg(price), max(price), min(price)
+from orders o join book b on(o.BOOKID = b.BOOKID)
+group by orderdate
+having count(custid) >= 2
+order by orderdate desc;
+
+--7 김연아의 총 주문액
+select name, sum(saleprice)
+from orders o join customer c on (o.custid = c.custid)
+where c.name = '김연아'
+group by c.name;
+
+--8 박지성이 구매한 도서수
+select name, count(bookid)
+from orders o join customer c on (o.custid = c.custid)
+where c.name = '박지성'
+group by c.name;
+
+--9 도서의 출판사 수
+select count(distinct publisher)
+from book;
+
+--10 박지성이 구매한 도서의 출판사 수
+select name, count(distinct publisher)
+from book b join orders o on (b.bookid=o.bookid) join customer c on(o.custid=c.custid)
+where c.name = '박지성'
+group by c.name;
+
+--11 박지성이 구매한 도서의 이름, 정가, 판매가
+select name, b.bookname, b.price, o.saleprice
+from book b join orders o on (b.bookid=o.bookid) join customer c on(o.custid=c.custid)
+where c.name = '박지성';
+
+--12 박지성이 구매한 도서의 이름, 정가와 판개가의 차이
+select name, b.bookname, b.price, o.saleprice, (price-saleprice) as "판매차액"
+from book b join orders o on (b.bookid=o.bookid) join customer c on(o.custid=c.custid)
+where c.name = '박지성';
+
+--13 박지성이 구매한 도서명
+select name, bookname
+from book b join orders o on (b.bookid=o.bookid) join customer c on(o.custid=c.custid)
+where c.name = '박지성';
+
+--14 박지성이 구매하지 않은 도서명 minus 함수
+select bookname
+from book b join orders o on (b.bookid=o.bookid) join customer c on(o.custid=c.custid)
+minus
+select bookname
+from book b join orders o on (b.bookid=o.bookid) join customer c on(o.custid=c.custid)
+where c.name = '박지성';
+
+--15 최고 정가
+select max(price)
+from book;
+
+--16 최고 비싼 정가의 도서명 -- 서브쿼리
+select bookname, price
+from book
+where price = (select max(price)from book);
+
+--17 최저가의 도서명
+select min(price)
+from book;
+
+--18 평균가 이상인 도서명
+select bookname, price
+from book
+where price >= (select avg(price) from book);
+
+--19 주문일이 2014년 7월 4일~7일 사이 주문번호, 판매가, 주문일
+select orderid, saleprice, orderdate
+from orders
+where orderdate between to_date('20140704') and to_date('20140707');
+
+--20 주문일이 2014년 7월 4일~7일 사이에 주문받은 건을 제외한 주문번호, 판매가, 주문일
+select orderid, saleprice, orderdate
+from orders
+minus
+select orderid, saleprice, orderdate
+from orders
+where orderdate between to_date('20140704') and to_date('20140707');
+
+--21 주문한 고객명
+select name
+from orders o join customer c on(o.custid=c.custid)
+where orderdate between to_date('20140704','yyyymmdd') and to_date('20140707','yyyymmdd')
+group by name;
+
+--22-1 주문하지 않은 고객명
+select name
+from orders, customer
+minus
+select name
+from orders o join customer c on(o.custid=c.custid);
+
+--22-2 null로 분류 
+select name
+from orders o right join customer c on(o.custid=c.custid)
+where o.custid is null;
+
+22-3 subquert(부속질의)
+select name
+from customer
+where custid not in (select custid from orders);
+
+
+--23 주문금액 총액, 평균 주문액
+select sum(saleprice), avg(saleprice)
+from orders;
+
+--24 고객명별 구매액
+select name, sum(saleprice)
+from orders o join customer c on(o.custid=c.custid)
+group by name;
+
+--25-1 고객명과 그 고객이 주문한 도서목록
+select name, bookname
+from book b join orders o on(o.BOOKID = b.BOOKID) join customer c on(o.custid = c.custid);
+
+--25-2 Aggrigation(집계)
+select name, listagg(bookname,',')within group(order by bookname)
+from book b join orders o on(o.BOOKID = b.BOOKID) join customer c on(o.custid = c.custid)
+group by name;
+
+--26 출판사, 도서명리스트 가격순으로 listagg 사용하라
+select publisher, listagg(bookname,',') within group(order by price)
+from book
+group by publisher;
+
+--27 도서의 가격과 판매액 차이
+select price-saleprice
+from orders o join book b on(o.BOOKID = b.BOOKID);
+
+--27-1 도서의 가격과 판매가격 차이 최고액
+select max(price-saleprice)
+from orders o join book b on(o.BOOKID = b.BOOKID);
+
+--27-2 도서의 가격과 판매가격 차이가 가장 많은 주문
+select o.*
+from orders o join book b on(o.BOOKID = b.BOOKID)
+where price-saleprice =(select max(price-saleprice) from orders o join book b on(o.BOOKID = b.BOOKID));
+
+--28 도서의 판매액 평균보다 자신의 구매액 평균이 더 높은 고객명
+select name, avg(saleprice)
+from orders o join book b on(o.BOOKID = b.BOOKID) join customer c on(c.custid=o.custid)
+group by name
+having avg(saleprice) > (select avg(saleprice) from orders o join customer c on(c.custid=o.custid));
+--28-1
+select avg(saleprice)
+from orders o join customer c on(c.custid=o.custid);
+--28-2
+select name, avg(saleprice)
+from orders o join  customer c on(c.custid=o.custid)
+group by name;
+
+--29 박지성이 구매한 도서의 출판사
+select publisher
+from orders o join book b on(o.BOOKID = b.BOOKID) join customer c on(c.custid = o.custid)
+where name = '박지성';
+
+--30 박지성이 구매한 고서의 출판사와 같은 출판사의 도서를 구매한 고객명
+select name, publisher
+from orders o join book b on(o.BOOKID = b.BOOKID) join customer c on(c.custid = o.custid)
+where name !='박지성'
+and publisher in (select publisher from orders o join book b on(o.BOOKID = b.BOOKID) join customer c on(c.custid = o.custid) where name = '박지성');
+
+--31 두 개 이상의 서로 다른 출판사에서 도서를 구매한 고객의 이름
+
+--31-1 고객번호별 주문한 출판사 수(단, 그 수가 2개 이상)
+select count(distinct publisher)
+from book b join orders o on (o.BOOKID = b.BOOKID)
+group by custid
+having count(*) >=2;
+
+--31-2 고객번호별 주문한 출판사 수 (단, 그수가 2개 이상인 고객명)
+select name
+from customer
+where custid in(select custid from book b join orders o on (o.BOOKID = b.BOOKID) group by custid having count(distinct publisher) >=2);
+
+--32 전체 고객의 30%이상이 구매한 도서
+--32-1 전체 고객수
+select count(distinct name)
+from customer;
+
+--32-2 각 도서를 구매한 고객수
+select bookid, count(distinct custid)
+from orders
+group by bookid;
+
+--32-3 전체 고객의 30%숫자
+select count(*)*0.3
+from customer;
+
+--32 전체 고객의 30%이상이 구매한 도서
+select bookname
+from book b join orders o on(b.bookid = o.bookid) join customer c on(o.custid = c.custid)
+group by bookname
+having count(distinct o.custid) >= (select count(*)*0.3
+from customer);
+
+--33 도서를 구매한 고객명
+select distinct name
+from orders o join customer c on(o.custid = c.custid);
+
+--33-1 
+select name
+from customer
+where custid in (select custid from orders);
+
+--34-1 대한미디어 출판사의 도서를 구매한 고객명(join)
+select distinct name
+from book b join orders o on(b.bookid = o.bookid) join customer c on(o.custid = c.custid);
+
+--34-2 대한미디어 출판사의 도서를 구매한 고객명(subquery)
+select name
+from customer
+where custid in (select custid from orders where bookid in(select bookid from book where publisher ='대한미디어'));
+
+--35 고객과 판매가 (단, 주문안한 사람도 나오도록)
+select name, saleprice
+from customer c left join orders o on(c.custid=o.custid);
+
+
+--36 고객명별 판매가 (단, 주문안한 사람도 나오도록)(listagg 함수 사용)
+select name, listagg(saleprice,',')within group(order by saleprice)
+from customer c left join orders o on(c.custid=o.custid)
+group by name;
+--36-1 고객명별 판매가 (단, 주문안한 사람도 나오도록)(listagg 함수 사용) [nvl](null=>0)
+select name, listagg(nvl(saleprice,0),',')within group(order by saleprice)
+from customer c full join orders o on(c.custid=o.custid)
+group by name;
+
+--37 가장 비싼 도서명과 가격
+select bookname, price
+from book
+where price in (select max(price) from book);
+
+--38 가장 싼 도서명과 가격
+select bookname, price
+from book
+where price in (select min(price) from book);
+
+--39-1 대한미디어 도서를 구매한 고객명
+select name
+from book b join orders o on(b.bookid = o.bookid) join customer c on(o.custid = c.custid)
+where publisher = '대한미디어';
+
+--39-2 대한미디어 도서를 구매한 고객명 서브쿼리
+select name
+from customer
+where custid in(select custid from orders where bookid in(select bookid from book where publisher ='대한미디어'));
+
+--40 출판사별로 평균가보다 비싼 도서명
+select bookname
+from book b1
+where price > (select avg(price) from book b2 where b1.publisher = b2.publisher);
+
+--41-1 판매되지 않은 도서명 (minus사용)[모든 도서명 - 판매된 도서]
+select bookname
+from book
+minus
+select bookname
+from book b join orders o on(b.bookid = o.bookid);
+
+--41-2 판매되지 않은 도서명(외부조인)
+select bookname
+from book b left join orders o on(b.bookid = o.bookid)
+where o.orderid is null;
+
+select name, address
+from customer cs
+where exists (select* from orders od where cs.custid=od.custid);
+
+--42 주문있는 도서명, 출판사, 가격
+select bookname, publisher, price
+from book b1
+where exists(select * from orders o1 where b1.bookid=o1.bookid);

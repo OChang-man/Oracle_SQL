@@ -1,0 +1,126 @@
+  -- ALL, SOME(any) --
+SELECT orderid, saleprice
+FROM orders
+WHERE saleprice > all(SELECT saleprice FROM orders WHERE custid=3);
+
+SELECT sum(saleprice)
+FROM orders o join customer c on(o.custid = c.custid)
+where address like '%대한민국%';
+ 
+  -- EXISTS --
+ 
+SELECT sum(saleprice)
+FROM orders od
+WHERE exists(SELECT * FROM customer cs WHERE address like '%대한민국%' and cs.custid = od.custid);
+
+  -- 스칼라 부속질의 --
+
+SELECT (SELECT name FROM customer cs WHERE cs.custid=od.custid) "name", sum(saleprice)
+FROM orders od
+GROUP BY od.custid;
+
+-- 5-1 도서번호, 도서명별 판매액 합계, 판매건수 , 평균 판매가(스칼라부속징의 이용)
+SELECT (SELECT BOOKNAME FROM BOOK b WHERE b.bookid=o.bookid) bookname,sum(saleprice),count(*),avg(saleprice)
+FROM orders o
+GROUP BY bookid;
+
+-- 5-2 도서번호, 도서명별 판매액 합계, 판매건수 , 평균 판매가(join 이용)
+SELECT o.bookid, bookname, sum(saleprice), count(*),avg(saleprice)
+FROM book b join orders o on(b.bookid=o.bookid)
+GROUP BY o.bookid, bookname;
+
+  --구조변경:Alter table ( ALTER TABLE 테이블명 ADD 속성명 타입;)
+  
+-- 6.orders테이블에 bookname 가변형문자 40자로 추가
+ALTER TABLE orders ADD bookname varchar2(40);
+
+-- 7.orders테이블에 bookname의 bookname값을 book테이블에 해당 도서명으로 수정 UPDATE SET
+UPDATE orders o SET bookname = (SELECT bookname FROM book b WHERE b.bookid=o.bookid);
+
+-- 8.oreders테이블에 customer의 name과 같은 속성 추가 밎 값입력
+desc CUSTOMER;
+desc orders;
+ALTER TABLE orders ADD name VARCHAR2(40);
+UPDATE orders SET name = (SELECT name FROM customer WHERE orders.custid=customer.custid);
+
+-- 9.orders테이블의 name,bookname 속성 삭제
+ALTER TABLE orders DROP COLUMN bookname;
+ALTER TABLE orders DROP COLUMN name;
+
+  -- 인라인뷰: FROM 절에 SELECT문 포함 --
+  
+-- 10-1.고객번호가 2이하인 고객의 고객명별 판매액(join)
+SELECT  name, sum(saleprice)
+FROM orders o join customer c on(o.custid=c.custid)
+WHERE c.custid <=2
+GROUP BY name;
+
+-- 10-2.고객번호가 2이하인 고객의 고객명별 판매액(subquery)
+SELECT name, sum(saleprice)
+FROM (SELECT custid, name FROM customer WHERE custid <=2) c, orders o
+where c.custid=o.custid
+GROUP BY name;
+
+-- 11. PPT (page40 슬라이드)
+--5 (1) 고객번호별 주문액 합계 (스칼라 부속질의 사용)
+SELECT custid, (SELECT address FROM customer cs WHERE cs.custid=od.custid) "address", sum(saleprice) "total"
+FROM orders od
+GROUP BY od.custid;
+
+--5 (2) 고객이름별 구매액의 평균값
+SELECT cs.name, s
+FROM (SELECT custid, avg(saleprice)s FROM orders GROUP BY custid) od, customer cs
+WHERE cs.custid=od.custid;
+
+--6 (3) 고객번호가 3번인 고객이 구해나 도서의 합
+SELECT sum(saleprice) "total"
+FROM orders od
+WHERE EXISTS (SELECT * FROM customer cs WHERE custid <=3 AND cs.custid=od.custid);
+
+  -- 뷰 생성: CREATE VIEW 뷰명 --
+  
+SELECT * FROM book WHERE bookname like '%축구%';
+
+CREATE VIEW vw_book
+AS SELECT *
+FROM book
+WHERE bookname like '%축구%';
+
+SELECT * FROM vw_book;
+SELECT * FROM user_views;
+
+-- 13.대한민국에 사는 고객정보를 vw_customer 뷰로 생성 후 내용 확인
+CREATE VIEW vw_customer
+AS SELECT *
+FROM customer
+WHERE address like '%대한민국%';
+
+SELECT * FROM vw_customer;
+
+-- 14.oreders 테이블에 고객이름과 도서명을 확인할 수있는 뷰 생성 => vw_orders
+CREATE VIEW vw_orders(orderid, custid, name, bookid, bookname, saleprice, orderdate)
+AS SELECT orderid, o.custid, name, b.bookid, bookname, saleprice, orderdate
+FROM orders o , customer c, book b
+WHERE o.custid=c.custid and o.bookid=b.bookid;
+
+-- 15. 14번 뷰를 이용하여 김연아 곡개이 주문한 주묺번호, 도서명, 주문액을 vw_orders를 이용하여 검색
+SELECT orderid , bookname, saleprice
+FROM  vw_orders
+WHERE name='김연아';
+
+  -- 뷰 수정: CREATE OR REPLACE VIEW 뷰이름(1열,2열,...)AS SELECT문
+  
+-- 16.vw_customer 뷰의 주소는 대한민국 고객만 있었는데, 이 뷰를 영국 주소의 고객으로 변경하기
+CREATE OR REPLACE VIEW vw_customer
+AS SELECT custid, name, address
+FROM customer
+WHERE address like'%영국%';
+
+SELECT * FROM vw_customer;
+
+-- 17. PPT (page49 슬라이드)
+--8. (1)
+CREATE VIEW highorders
+AS SELECT b.bookid, bookname, name, publisher, saleprice
+FROM book b join orders o on(b.bookid=o.bookid) join customer c on(o.custid=c.custid)
+WHERE saleprice >= 20000;
